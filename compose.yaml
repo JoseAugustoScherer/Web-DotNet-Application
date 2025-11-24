@@ -1,0 +1,7 @@
+﻿services:
+  mymarket:
+    image: mymarket
+    build:
+      context: .
+      dockerfile: MyMarket/Dockerfile
+
