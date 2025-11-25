@@ -2,7 +2,7 @@ using MyMarket.Core.Enums;
 
 namespace MyMarket.Application.Features.Products.Queries;
 
-public record ProductDTO(
+public record ProductDto(
     Guid Id,
     string Name,
     string Description,

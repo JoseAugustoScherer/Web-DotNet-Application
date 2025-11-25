@@ -22,7 +22,7 @@ public class GetProductByCategoryQueryHandler : IQueryHandler<GetProductByCatego
 
             var productsInCategory = allProducts.Where(p => p.Category == query.ProductCategory).ToList();
 
-            var productResponse = productsInCategory.Select(product => new ProductDTO(
+            var productResponse = productsInCategory.Select(product => new ProductDto(
                 product.Id,
                 product.Name,
                 product.Description,
@@ -32,11 +32,11 @@ public class GetProductByCategoryQueryHandler : IQueryHandler<GetProductByCatego
                 product.Stock
             )).ToList();
 
-            return ResponseViewModel<List<ProductDTO>>.Ok(productResponse);
+            return ResponseViewModel<List<ProductDto>>.Ok(productResponse);
         }
         catch (Exception e)
         {
-            return ResponseViewModel<List<ProductDTO>>.Fail(e.Message, 500);
+            return ResponseViewModel<List<ProductDto>>.Fail(e.Message, 500);
         }
     }
 }

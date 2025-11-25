@@ -20,7 +20,7 @@ public class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQuery, Res
         {
             var products = await _repository.GetAllAsync();
 
-            var productsDto = products.Select(p => new ProductDTO(
+            var productsDto = products.Select(p => new ProductDto(
                 p.Id,
                 p.Name,
                 p.Description,
@@ -29,7 +29,7 @@ public class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQuery, Res
                 p.Sku,
                 p.Stock)).ToList();
         
-            return ResponseViewModel<List<ProductDTO>>.Ok(productsDto);
+            return ResponseViewModel<List<ProductDto>>.Ok(productsDto);
         }
         catch (Exception e)
         {

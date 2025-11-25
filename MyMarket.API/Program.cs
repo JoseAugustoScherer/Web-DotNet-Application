@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MyMarket.Application.Features.Products.Commands;
 using MyMarket.Application.Features.Products.Queries;
 using MyMarket.Application.Features.Users.Commands;
+using MyMarket.Application.Features.Users.Queries;
 using MyMarket.Application.Validators;
 using MyMarket.Core.Entities;
 using MyMarket.Core.Enums;
@@ -36,6 +37,7 @@ builder.Services.AddScoped<GetAllProductsQueryHandler>();
 builder.Services.AddScoped<GetProductByIdQueryHandler>();
 builder.Services.AddScoped<GetProductByCategoryQueryHandler>();
 //Query user handlers
+builder.Services.AddScoped<GetAllUsersQueryHandler>();
 
 // Update Product handlers
 builder.Services.AddScoped<CreateProductCommandHandler>();
@@ -210,6 +212,13 @@ app.MapPost("/api/users", async (CreateUserCommand command, CreateUserCommandHan
     
     var userId = await handler.HandleAsync(command);
     return Results.Created($"/api/users/{userId}", new { Id = userId });
+});
+
+app.MapGet("/api/users", async (GetAllUsersQueryHandler handler) =>
+{
+    var query = new GetAllUsersQuery();
+    var result = await handler.HandleAsync(query);
+    return Results.Ok(result);
 });
 
 app.Run();

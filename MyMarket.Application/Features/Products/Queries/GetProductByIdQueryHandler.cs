@@ -21,9 +21,9 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Res
             var product = await _repository.GetByIdAsync(query.ProductId);
 
             if (product is null)
-                return ResponseViewModel<ProductDTO>.Fail("Product not found", 404);
+                return ResponseViewModel<ProductDto>.Fail("Product not found", 404);
 
-            var productResponse = new ProductDTO(
+            var productResponse = new ProductDto(
                 product.Id,
                 product.Name,
                 product.Description,
@@ -32,7 +32,7 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Res
                 product.Sku,
                 product.Stock);
 
-            return ResponseViewModel<ProductDTO>.Ok(productResponse);
+            return ResponseViewModel<ProductDto>.Ok(productResponse);
         }
         catch (Exception e)
         {
