@@ -34,10 +34,10 @@ public class UserValidator : AbstractValidator<CreateUserCommand>
               .Matches(@"[A-Z]").WithMessage("The password must contain at least one stored letter.")
               .Matches(@"[a-z]").WithMessage("The password must contain at least one lowercase letter.")
               .Matches(@"\d").WithMessage("The password must contain at least one number.")
-              .Matches(@"[@$!%*?&]").WithMessage("The password must contain at least one special character.");
+              .Matches(@"[#@$!%*?&]").WithMessage("The password must contain at least one special character.");
               
-          RuleFor(user => user.ConfirmPassword)
-              .Equal(user => user.Password).WithMessage("Passwords do not match");
+          // RuleFor(user => user.ConfirmPassword)
+          //     .Equal(user => user.Password).WithMessage("Passwords do not match");
           
           RuleFor(user => user.Gender)
               .IsInEnum().WithMessage("Gender is invalid");

@@ -9,7 +9,6 @@ public sealed record CreateUserCommand
     public string LastName { get; init; }
     public string Email { get; init; }
     public string Password { get; init; }
-    public string ConfirmPassword { get; init; }
     public Gender Gender { get; init; }
     public DateTime BirthDate { get; init; }
     public Role Role { get; init; }
