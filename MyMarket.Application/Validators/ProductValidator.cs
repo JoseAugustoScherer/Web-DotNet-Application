@@ -26,5 +26,6 @@ public class ProductValidator : AbstractValidator<CreateProductCommand>
         RuleFor(product => product.Stock)
             .NotEmpty().WithMessage("Stock is required")
             .GreaterThan(0).WithMessage("Stock must be greater than 0");
+        
     }
 }

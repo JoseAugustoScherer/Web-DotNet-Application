@@ -1,9 +1,10 @@
 using MyMarket.Application.Abstractions;
+using MyMarket.Application.ViewModel;
 using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Products.Commands;
 
-public class UpdateProductSkuCommandHandler : ICommandHandler<UpdateProductSkuCommand>
+public class UpdateProductSkuCommandHandler : ICommandHandler<UpdateProductSkuCommand, ResponseViewModel>
 {
     private readonly IProductRepository _productRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -14,14 +15,23 @@ public class UpdateProductSkuCommandHandler : ICommandHandler<UpdateProductSkuCo
         _unitOfWork = unitOfWork;
     }
     
-    public async Task HandleAsync(UpdateProductSkuCommand command)
+    public async Task<ResponseViewModel> HandleAsync(UpdateProductSkuCommand command)
     {
-        var product = await _productRepository.GetByIdAsync(command.ProductId);
+        try
+        {
+            var product = await _productRepository.GetByIdAsync(command.ProductId);
         
-        if (product is null)
-            throw new KeyNotFoundException("Product not found");
+            if (product is null)
+                return ResponseViewModel.Fail("Product not found", 404);
         
-        product.UpdateSku(command.Sku);
-        await _unitOfWork.CommitAsync();
+            product.UpdateSku(command.Sku);
+            await _unitOfWork.CommitAsync();
+            
+            return ResponseViewModel.Ok();
+        }
+        catch (Exception e)
+        {
+            return ResponseViewModel.Fail(e.Message, 500);
+        }
     }
 }
