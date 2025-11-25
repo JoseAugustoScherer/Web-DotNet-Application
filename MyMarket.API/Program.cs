@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using MyMarket.Application.Features.Products.Commands;
 using MyMarket.Application.Features.Products.Queries;
+using MyMarket.Application.Features.Users.Commands;
 using MyMarket.Application.Validators;
 using MyMarket.Core.Entities;
 using MyMarket.Core.Enums;
@@ -30,25 +31,28 @@ builder.Services.AddScoped<IRepository<Product>, Repository<Product>>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-builder.Services.AddScoped<CreateProductCommandHandler>();
-
-//Query handlers
+//Query product handlers
 builder.Services.AddScoped<GetAllProductsQueryHandler>();
 builder.Services.AddScoped<GetProductByIdQueryHandler>();
 builder.Services.AddScoped<GetProductByCategoryQueryHandler>();
+//Query user handlers
 
-// Update handlers
+// Update Product handlers
+builder.Services.AddScoped<CreateProductCommandHandler>();
 builder.Services.AddScoped<UpdateProductNameCommandHandler>();
 builder.Services.AddScoped<UpdateProductDescriptionCommandHandler>();
 builder.Services.AddScoped<UpdateProductSkuCommandHandler>();
 builder.Services.AddScoped<UpdateProductPriceCommandHandler>();
 builder.Services.AddScoped<UpdateProductCategoryCommandHandler>();
 builder.Services.AddScoped<UpdateProductStockCommandHandler>();
+// Update Product handlers
+builder.Services.AddScoped<CreateUserCommandHandler>();
 
+// Fluent Validation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
-
 builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 
 // Pode colocar no Program.cs ou em um arquivo separado
 
@@ -66,6 +70,7 @@ app.UseHttpsRedirection();
 // ===================================================
 // ENDPOINTS - Minimal API
 // ===================================================
+// PRODUCTS
 app.MapGet("/api/products", async (GetAllProductsQueryHandler handler) =>
 {
     var query = new GetAllProductsQuery();
@@ -193,9 +198,18 @@ app.MapPatch("/api/products/{id}/stock", async (Guid id, UpdateProductInputModel
         return Results.NotFound(e.Message);
     }
 });
-// app.MapDelete("/api/products/{id}", async (Guid, id, DeleteProductCommand command, DeleteProductCommandHandler handler) =>
-// {
-//     
-// });
+// USER
+app.MapPost("/api/users", async (CreateUserCommand command, CreateUserCommandHandler handler, IValidator<CreateUserCommand> validator) => 
+{
+    var validationResult = await validator.ValidateAsync(command);
+    
+    if (!validationResult.IsValid)
+    {
+        return Results.ValidationProblem(validationResult.ToDictionary());
+    }
+    
+    var userId = await handler.HandleAsync(command);
+    return Results.Created($"/api/users/{userId}", new { Id = userId });
+});
 
 app.Run();

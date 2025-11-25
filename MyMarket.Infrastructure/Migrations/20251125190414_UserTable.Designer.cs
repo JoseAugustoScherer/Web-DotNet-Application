@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyMarket.Infrastructure.Persistence;
 
@@ -10,9 +11,11 @@ using MyMarket.Infrastructure.Persistence;
 namespace MyMarket.Infrastructure.Migrations
 {
     [DbContext(typeof(MyMarketDbContext))]
-    partial class MyMarketDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251125190414_UserTable")]
+    partial class UserTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");

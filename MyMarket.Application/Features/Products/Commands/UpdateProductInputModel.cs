@@ -2,7 +2,7 @@ using MyMarket.Core.Enums;
 
 namespace MyMarket.Application.Features.Products.Commands;
 
-public record UpdateProductInputModel(
+public sealed record UpdateProductInputModel(
     string Name,
     string Description,
     Category Category,

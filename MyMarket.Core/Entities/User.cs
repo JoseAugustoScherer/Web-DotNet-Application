@@ -11,6 +11,7 @@ public sealed class User(
     Gender gender,
     DateTime birthDate,
     Role role,
+    ActiveStatus activeStatus,
     DateTime createdOn)
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
@@ -21,6 +22,7 @@ public sealed class User(
     public Gender Gender { get; private set; } = gender;
     public DateTime BirthDate { get; private set; } = birthDate;
     public Role Role { get; private set; } = role;
+    public ActiveStatus ActiveStatus { get; set; } =  ActiveStatus.Active;
     public DateTime CreatedOn { get; private set; } = DateTime.UtcNow;
     public DateTime ModifiedOn { get; private set; }
 
@@ -55,11 +57,25 @@ public sealed class User(
     public void UpdateGender(Gender gender)
     {
         Gender = gender;
+        ModifiedOn = DateTime.UtcNow;
     }
 
     public void UpdateBirthDate(DateTime birthDate)
     {
         BirthDate = birthDate;
+        ModifiedOn = DateTime.UtcNow;
+    }
+
+    public void UpdateRole(Role role)
+    {
+        Role = role;
+        ModifiedOn = DateTime.UtcNow;
+    }
+
+    public void UpdateStatus(ActiveStatus activeStatus)
+    {
+        ActiveStatus = activeStatus;
+        ModifiedOn = DateTime.UtcNow;
     }
     
     private static void IsValidateString(string field)

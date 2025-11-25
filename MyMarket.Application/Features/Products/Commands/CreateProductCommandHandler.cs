@@ -7,12 +7,12 @@ namespace MyMarket.Application.Features.Products.Commands;
 
 public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, ResponseViewModel<Guid>>
 {
-    private readonly IRepository<Product> _productRepository;
+    private readonly IRepository<Product> _repository;
     private readonly IUnitOfWork _unitOfWork;
     
     public CreateProductCommandHandler(IRepository<Product> productRepository, IUnitOfWork unitOfWork)
     {
-        _productRepository = productRepository;
+        _repository = productRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -28,7 +28,7 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
                 command.Sku,
                 command.Stock);
         
-            await _productRepository.AddAsync(product);
+            await _repository.AddAsync(product);
             await _unitOfWork.CommitAsync();
             
             return ResponseViewModel<Guid>.Ok(product.Id);

@@ -2,6 +2,6 @@ using MyMarket.Core.Enums;
 
 namespace MyMarket.Application.Features.Products.Commands;
 
-public record UpdateProductCategoryCommand(
+public sealed record UpdateProductCategoryCommand(
     Guid Id,
     Category Category);

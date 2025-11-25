@@ -15,4 +15,8 @@
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Features\Users\Queries\" />
+    </ItemGroup>
+
 </Project>
