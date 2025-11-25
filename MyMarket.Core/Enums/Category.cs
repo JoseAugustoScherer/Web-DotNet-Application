@@ -2,7 +2,7 @@ namespace MyMarket.Core.Enums;
 
 public enum Category
 {
-    Electraonics,
+    Electronics,
     Clothing,
     Food,
     Beauty,
