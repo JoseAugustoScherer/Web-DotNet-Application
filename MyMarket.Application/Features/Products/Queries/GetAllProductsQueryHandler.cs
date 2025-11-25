@@ -7,18 +7,18 @@ namespace MyMarket.Application.Features.Products.Queries;
 
 public class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQuery, ResponseViewModel>
 {
-    private readonly IRepository<Product> _productRepository;
+    private readonly IRepository<Product> _repository;
     
-    public GetAllProductsQueryHandler(IProductRepository productRepository)
+    public GetAllProductsQueryHandler(IRepository<Product> repository)
     {
-        _productRepository = productRepository;
+        _repository = repository;
     }
     
     public async Task<ResponseViewModel> HandleAsync(GetAllProductsQuery query)
     {
         try
         {
-            var products = await _productRepository.GetAllAsync();
+            var products = await _repository.GetAllAsync();
 
             var productsDto = products.Select(p => new ProductDTO(
                 p.Id,

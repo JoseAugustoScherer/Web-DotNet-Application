@@ -5,7 +5,7 @@ using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Infrastructure.Persistence;
 
-public class Repository : IProductRepository
+public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 {
     private readonly MyMarketDbContext _dbContext;
     
@@ -13,60 +13,33 @@ public class Repository : IProductRepository
     {
         _dbContext = dbContext;
     }
-    
-    public async Task<IEnumerable<Product>> GetAllAsync()
+    public async Task<IEnumerable<TEntity>> GetAllAsync()
     {
-        return await _dbContext.Set<Product>().ToListAsync();
+        return await _dbContext.Set<TEntity>().ToListAsync();
     }
 
-    public async Task<Product> GetByIdAsync(Guid id)
+    public async Task<TEntity?> GetByIdAsync(Guid id)
     {
-        if (id == Guid.Empty)
-            throw new Exception("Id cannot be empty");
-        
-        var entity = await _dbContext.Set<Product>().FindAsync(id);
-        
-        if (entity == null)
-            throw new Exception("No entity found");
-        
-        return entity;
+        return await _dbContext.Set<TEntity>().FindAsync(id);
     }
 
-    public Task UpdateAsync(Product entity)
+    public async Task AddAsync(TEntity entity)
     {
-        _dbContext.Set<Product>().Update(entity);
-        return Task.CompletedTask;
+        _dbContext.Set<TEntity>().Add(entity);
     }
 
-    public Task AddAsync(Product entity)
+    public async Task DeleteAsync(TEntity entity)
     {
-        _dbContext.Set<Product>().Add(entity);
-        return Task.CompletedTask;
-    }
-
-    public Task DeleteAsync(Product entity)
-    {
-        _dbContext.Set<Product>().Remove(entity);
-        return Task.CompletedTask;
+        _dbContext.Set<TEntity>().Remove(entity);
     }
     
-    public async Task<IEnumerable<Product>?> GetByCategory(Category category)
+    public void Dispose()
     {
-        var results = await _dbContext.Set<Product>().Where(product => product.Category == category).ToListAsync();
-        
-        if (results == null)
-            throw new Exception($"No entity with ${category} found");
-        
-        return results; 
+        _dbContext.Dispose();
     }
 
-    public async Task<Product?> GetBySku(string sku)
+    public async ValueTask DisposeAsync()
     {
-        var result = await _dbContext.Set<Product>().FindAsync(sku);
-        
-        if (result == null)
-            throw new Exception($"No entity with ${sku} found");
-        
-        return result; 
+        await _dbContext.DisposeAsync();
     }
 }

@@ -1,23 +1,24 @@
 using MyMarket.Application.Abstractions;
 using MyMarket.Application.ViewModel;
+using MyMarket.Core.Entities;
 using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Products.Queries;
 
 public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, ResponseViewModel>
 {
-    private readonly IProductRepository _productRepository;
+    private readonly IRepository<Product> _repository;
     
-    public GetProductByIdQueryHandler(IProductRepository productRepository)
+    public GetProductByIdQueryHandler(IRepository<Product> repository)
     {
-        _productRepository = productRepository;
+        _repository = repository;
     }
     
     public async Task<ResponseViewModel> HandleAsync(GetProductByIdQuery query)
     {
         try
         {
-            var product = await _productRepository.GetByIdAsync(query.ProductId);
+            var product = await _repository.GetByIdAsync(query.ProductId);
 
             if (product is null)
                 return ResponseViewModel<ProductDTO>.Fail("Product not found", 404);

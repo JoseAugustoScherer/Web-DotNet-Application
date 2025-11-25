@@ -1,17 +1,18 @@
 using MyMarket.Application.Abstractions;
 using MyMarket.Application.ViewModel;
+using MyMarket.Core.Entities;
 using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Products.Commands;
 
 public class UpdateProductStockCommandHandler : ICommandHandler<UpdateProductStockCommand, ResponseViewModel>
 {
-    private readonly IProductRepository _productRepository;
+    private readonly IRepository<Product> _repository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateProductStockCommandHandler(IProductRepository productRepository, IUnitOfWork unitOfWork)
+    public UpdateProductStockCommandHandler(IRepository<Product> repository, IUnitOfWork unitOfWork)
     {
-        _productRepository = productRepository;
+        _repository = repository;
         _unitOfWork = unitOfWork;
     }
     
@@ -19,7 +20,7 @@ public class UpdateProductStockCommandHandler : ICommandHandler<UpdateProductSto
     {
         try
         {
-            var product = await _productRepository.GetByIdAsync(command.Id);
+            var product = await _repository.GetByIdAsync(command.Id);
         
             if (product == null)
                 return ResponseViewModel.Fail("Product not found", 404);

@@ -26,9 +26,9 @@ builder.Services.AddDbContext<MyMarketDbContext>(options =>
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddScoped<IProductRepository, Repository>();
+builder.Services.AddScoped<IRepository<Product>, Repository<Product>>();
 
-builder.Services.AddScoped(typeof(IRepository<Product>), typeof(Repository));
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 builder.Services.AddScoped<CreateProductCommandHandler>();
 
