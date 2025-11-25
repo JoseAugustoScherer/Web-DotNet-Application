@@ -4,7 +4,7 @@ using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Products.Queries;
 
-public class GetProductByCategoryQueryHandler : IQueryHandler<GetProductByCategoryQuery, ResponseViewModel<List<ProductDTO>>>
+public class GetProductByCategoryQueryHandler : IQueryHandler<GetProductByCategoryQuery, ResponseViewModel>
 {
     private readonly IProductRepository _productRepository;
 
@@ -13,22 +13,29 @@ public class GetProductByCategoryQueryHandler : IQueryHandler<GetProductByCatego
         _productRepository = productRepository;
     }
     
-    public async Task<ResponseViewModel<List<ProductDTO>>> HandleAsync(GetProductByCategoryQuery query)
+    public async Task<ResponseViewModel> HandleAsync(GetProductByCategoryQuery query)
     {
-        var allProducts = await _productRepository.GetAllAsync();
-        
-        var productsInCategory = allProducts.Where(p => p.Category == query.ProductCategory).ToList();
-        
-        var productResponse = productsInCategory.Select(product => new ProductDTO(
-            product.Id,
-            product.Name,
-            product.Description,
-            product.Category,
-            product.Price,
-            product.Sku,
-            product.Stock
+        try
+        {
+            var allProducts = await _productRepository.GetAllAsync();
+
+            var productsInCategory = allProducts.Where(p => p.Category == query.ProductCategory).ToList();
+
+            var productResponse = productsInCategory.Select(product => new ProductDTO(
+                product.Id,
+                product.Name,
+                product.Description,
+                product.Category,
+                product.Price,
+                product.Sku,
+                product.Stock
             )).ToList();
-        
-        return ResponseViewModel<List<ProductDTO>>.Ok(productResponse);
+
+            return ResponseViewModel<List<ProductDTO>>.Ok(productResponse);
+        }
+        catch (Exception e)
+        {
+            return ResponseViewModel<List<ProductDTO>>.Fail(e.Message, 500);
+        }
     }
 }

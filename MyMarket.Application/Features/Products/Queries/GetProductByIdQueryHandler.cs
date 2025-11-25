@@ -4,7 +4,7 @@ using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Products.Queries;
 
-public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, ResponseViewModel<ProductDTO>>
+public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, ResponseViewModel>
 {
     private readonly IProductRepository _productRepository;
     
@@ -13,22 +13,29 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Res
         _productRepository = productRepository;
     }
     
-    public async Task<ResponseViewModel<ProductDTO>> HandleAsync(GetProductByIdQuery query)
+    public async Task<ResponseViewModel> HandleAsync(GetProductByIdQuery query)
     {
-        var product = await _productRepository.GetByIdAsync(query.ProductId);
+        try
+        {
+            var product = await _productRepository.GetByIdAsync(query.ProductId);
 
-        if(product is null)
-            return ResponseViewModel<ProductDTO>.Fail("Product not found", 404);
-        
-        var productResponse = new ProductDTO(
-            product.Id,
-            product.Name,
-            product.Description,
-            product.Category,
-            product.Price,
-            product.Sku,
-            product.Stock);
-        
-        return ResponseViewModel<ProductDTO>.Ok(productResponse);
+            if (product is null)
+                return ResponseViewModel<ProductDTO>.Fail("Product not found", 404);
+
+            var productResponse = new ProductDTO(
+                product.Id,
+                product.Name,
+                product.Description,
+                product.Category,
+                product.Price,
+                product.Sku,
+                product.Stock);
+
+            return ResponseViewModel<ProductDTO>.Ok(productResponse);
+        }
+        catch (Exception e)
+        {
+            return ResponseViewModel.Fail(e.Message, 500);
+        }
     }
 }

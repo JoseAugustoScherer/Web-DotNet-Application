@@ -31,7 +31,7 @@ public class UpdateProductStockCommandHandler : ICommandHandler<UpdateProductSto
         }
         catch (Exception e)
         {
-            return  ResponseViewModel.Fail(e, 500);
+            return  ResponseViewModel.Fail(e.Message, 500);
         }
     }
 }

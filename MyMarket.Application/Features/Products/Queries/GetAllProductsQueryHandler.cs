@@ -5,7 +5,7 @@ using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Products.Queries;
 
-public class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQuery, ResponseViewModel<List<ProductDTO>>>
+public class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQuery, ResponseViewModel>
 {
     private readonly IRepository<Product> _productRepository;
     
@@ -14,19 +14,27 @@ public class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQuery, Res
         _productRepository = productRepository;
     }
     
-    public async Task<ResponseViewModel<List<ProductDTO>>> HandleAsync(GetAllProductsQuery query)
+    public async Task<ResponseViewModel> HandleAsync(GetAllProductsQuery query)
     {
-        var products = await _productRepository.GetAllAsync();
+        try
+        {
+            var products = await _productRepository.GetAllAsync();
 
-        var productsDto = products.Select(p => new ProductDTO(
-            p.Id,
-            p.Name,
-            p.Description,
-            p.Category,
-            p.Price,
-            p.Sku,
-            p.Stock)).ToList();
+            var productsDto = products.Select(p => new ProductDTO(
+                p.Id,
+                p.Name,
+                p.Description,
+                p.Category,
+                p.Price,
+                p.Sku,
+                p.Stock)).ToList();
         
-        return ResponseViewModel<List<ProductDTO>>.Ok(productsDto);
+            return ResponseViewModel<List<ProductDTO>>.Ok(productsDto);
+        }
+        catch (Exception e)
+        {
+            return ResponseViewModel.Fail(e.Message, 500);
+        }
+        
     }
 }
