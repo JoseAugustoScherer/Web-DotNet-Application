@@ -8,7 +8,7 @@ public sealed class Product(
     Category category,
     decimal price,
     string sku,
-    int stock)
+    int stock) : BaseEntity
 {
     
     public Guid Id { get; private set; } =  Guid.NewGuid();
@@ -18,24 +18,18 @@ public sealed class Product(
     public decimal Price { get; private set; } = price;
     public string Sku { get; private set; }  = sku;
     public int Stock { get; private set; } =  stock;
-    public DateTime CreatedOn { get; private set; } = DateTime.Now;
-    public DateTime ModifiedOn { get; private set; }
 
     public void UpdateName(
         string name)
     {
         ValidFields(name);
         Name = name;
-        
-        ModifiedOn = DateTime.UtcNow;
     }
 
     public void UpdateDescription(string description)
     {
         ValidFields(description);
         Description = description;
-        
-        ModifiedOn = DateTime.Now;
     }
     
     public void UpdatePrice(decimal newPrice)
@@ -44,22 +38,17 @@ public sealed class Product(
             throw new ArgumentOutOfRangeException(nameof(newPrice), "Price cannot be negative.");
         
         Price = newPrice;
-        ModifiedOn = DateTime.Now;
     }
 
     public void UpdateSku(string sku)
     {
         ValidFields(sku);
         Sku = sku;
-        
-        ModifiedOn = DateTime.Now;
     }
 
     public void UpdateCategory(Category categoryId)
     {
         Category =  categoryId;
-        
-        ModifiedOn = DateTime.Now;
     }
     
     public void UpdateStock(int amount)
@@ -67,7 +56,6 @@ public sealed class Product(
         ValidQuantity(amount);
         
         Stock = amount;
-        ModifiedOn = DateTime.Now;
     }
     
     public void IncreaseStock(int amount)
@@ -75,7 +63,6 @@ public sealed class Product(
         ValidQuantity(amount);
         
         Stock += amount;
-        ModifiedOn = DateTime.Now;
     }
 
     public void DecreaseStock(int amount)
@@ -86,7 +73,6 @@ public sealed class Product(
             throw new InvalidOperationException("Stock cannot be negative.");
         
         Stock -= amount;
-        ModifiedOn = DateTime.Now;
     }
     
     private static void ValidQuantity(int quantity)

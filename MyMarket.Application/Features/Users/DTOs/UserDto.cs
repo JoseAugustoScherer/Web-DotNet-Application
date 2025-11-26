@@ -1,6 +1,6 @@
 using MyMarket.Core.Enums;
 
-namespace MyMarket.Application.Features.Users.Queries;
+namespace MyMarket.Application.Features.Users.DTOs;
 
 public sealed record UserDto(
     Guid Id,

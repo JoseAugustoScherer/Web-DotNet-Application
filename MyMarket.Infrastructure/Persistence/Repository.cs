@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using MyMarket.Core.Repositories.Interfaces;
 
@@ -26,7 +27,12 @@ public class Repository<TEntity>(MyMarketDbContext dbContext) : IRepository<TEnt
     {
         _dbSet.Remove(entity);
     }
-    
+
+    public async Task<TEntity?> GetItemByAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken)
+    {
+        return await _dbSet.AsNoTracking().FirstOrDefaultAsync(predicate, cancellationToken);
+    }
+
     public void Dispose()
     {
         dbContext.Dispose();

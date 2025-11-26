@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using MyMarket.Application.Abstractions;
 using MyMarket.Application.ViewModel;
 using MyMarket.Core.Entities;
@@ -5,31 +6,38 @@ using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Users.Commands;
 
+
+
 public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, ResponseViewModel<Guid>>
 {
-    private readonly IRepository<User> _repository;
+    private readonly IUserRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly PasswordHasher<string> _hasher;
 
-    public CreateUserCommandHandler(IRepository<User> repository, IUnitOfWork unitOfWork)
+    public CreateUserCommandHandler(IUserRepository repository, IUnitOfWork unitOfWork)
     {
         _repository = repository;
         _unitOfWork = unitOfWork;
+        _hasher = new PasswordHasher<string>();
+        
     }
     
     public async Task<ResponseViewModel<Guid>> HandleAsync(CreateUserCommand command)
     {
         try
         {
+            string password = _hasher.HashPassword(null, command.Password);
+            
             var user = new User(
                 command.Name,
                 command.LastName,
                 command.Email,
-                command.Password,
+                command.Amount,
+                password,
                 command.Gender,
                 command.BirthDate,
                 command.Role,
-                command.ActiveStatus,
-                command.CreatedOn);
+                command.ActiveStatus);
             
             await _repository.AddAsync(user);
             await _unitOfWork.CommitAsync();

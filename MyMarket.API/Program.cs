@@ -1,14 +1,20 @@
+using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using MyMarket.Application.Abstractions;
 using MyMarket.Application.Features.Products.Commands;
 using MyMarket.Application.Features.Products.Queries;
 using MyMarket.Application.Features.Users.Commands;
 using MyMarket.Application.Features.Users.Queries;
 using MyMarket.Application.Validators;
+using MyMarket.Application.ViewModel;
 using MyMarket.Core.Entities;
 using MyMarket.Core.Enums;
 using MyMarket.Core.Repositories.Interfaces;
+using MyMarket.Infrastructure.Auth;
 using MyMarket.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +27,30 @@ builder.Services.AddSwaggerGen();
 // ================================================ //
 // Builder = How to create the necessary artifacts  //
 // ================================================ //
+// Register of AuthService
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Add and configure the authentication JWT
+// builder.Services
+//     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(options =>
+//     {
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidateAudience = true,
+//             ValidateLifetime = true,
+//             ValidateIssuerSigningKey = true,
+//
+//             ValidIssuer = builder.Configuration["Jwt:Issuer"],
+//             ValidAudience = builder.Configuration["Jwt:Audience"],
+//             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+//         };
+//     });
+
+// Add authorization supports
+builder.Services.AddAuthorization();
+
 var connectionString = "Data Source=MyMarket.db";
 
 builder.Services.AddDbContext<MyMarketDbContext>(options => 
@@ -31,6 +61,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IRepository<Product>, Repository<Product>>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 //Query product handlers
 builder.Services.AddScoped<GetAllProductsQueryHandler>();
@@ -48,7 +79,7 @@ builder.Services.AddScoped<UpdateProductPriceCommandHandler>();
 builder.Services.AddScoped<UpdateProductCategoryCommandHandler>();
 builder.Services.AddScoped<UpdateProductStockCommandHandler>();
 // Update Product handlers
-builder.Services.AddScoped<CreateUserCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<CreateUserCommand, ResponseViewModel<Guid>>, CreateUserCommandHandler>();
 
 // Fluent Validation
 builder.Services.AddFluentValidationAutoValidation();
@@ -68,6 +99,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 // ===================================================
 // ENDPOINTS - Minimal API
@@ -201,7 +234,7 @@ app.MapPatch("/api/products/{id}/stock", async (Guid id, UpdateProductInputModel
     }
 });
 // USER
-app.MapPost("/api/users", async (CreateUserCommand command, CreateUserCommandHandler handler, IValidator<CreateUserCommand> validator) => 
+app.MapPost("/api/users", async (CreateUserCommand command, ICommandHandler<CreateUserCommand, ResponseViewModel<Guid>> handler, IValidator<CreateUserCommand> validator) => 
 {
     var validationResult = await validator.ValidateAsync(command);
     
@@ -211,6 +244,7 @@ app.MapPost("/api/users", async (CreateUserCommand command, CreateUserCommandHan
     }
     
     var userId = await handler.HandleAsync(command);
+    
     return Results.Created($"/api/users/{userId}", new { Id = userId });
 });
 

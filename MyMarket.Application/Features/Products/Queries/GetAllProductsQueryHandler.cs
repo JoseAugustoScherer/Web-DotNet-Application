@@ -1,4 +1,5 @@
 using MyMarket.Application.Abstractions;
+using MyMarket.Application.Features.Products.DTOs;
 using MyMarket.Application.ViewModel;
 using MyMarket.Core.Entities;
 using MyMarket.Core.Repositories.Interfaces;

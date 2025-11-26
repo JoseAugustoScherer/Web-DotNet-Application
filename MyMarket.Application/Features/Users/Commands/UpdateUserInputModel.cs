@@ -6,6 +6,7 @@ public sealed record UpdateUserInputModel(
     string FirstName,
     string LastName,
     string Email,
+    decimal Amount,
     string Password,
     Gender? Gender,
     DateTime? BirthDate,

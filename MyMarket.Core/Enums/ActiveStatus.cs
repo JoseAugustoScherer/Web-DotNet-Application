@@ -2,6 +2,6 @@ namespace MyMarket.Core.Enums;
 
 public enum ActiveStatus
 {
-    Active,
-    Inactive,
+    Active = 0,
+    Inactive = 1,
 }

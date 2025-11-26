@@ -1,6 +1,6 @@
 using MyMarket.Core.Enums;
 
-namespace MyMarket.Application.Features.Products.Queries;
+namespace MyMarket.Application.Features.Products.DTOs;
 
 public record ProductDto(
     Guid Id,

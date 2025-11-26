@@ -7,75 +7,85 @@ public sealed class User(
     string name,
     string lastName,
     string email,
+    decimal amount,
     string password,
     Gender gender,
     DateTime birthDate,
     Role role,
-    ActiveStatus activeStatus,
-    DateTime createdOn)
+    ActiveStatus activeStatus) : BaseEntity
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
-    public String Name { get; private set; } = name;
-    public String LastName { get; private set; } = lastName;
-    public String Email { get; private set; } = email;
-    public String Password { get; private set; } = password;
+    public string Name { get; private set; } = name;
+    public string LastName { get; private set; } = lastName;
+    public string Email { get; private set; } = email;
+    public decimal Amount { get; private set; } = amount;
+    public string Password { get; private set; } = password;
     public Gender Gender { get; private set; } = gender;
     public DateTime BirthDate { get; private set; } = birthDate;
     public Role Role { get; private set; } = role;
     public ActiveStatus ActiveStatus { get; set; } =  ActiveStatus.Active;
-    public DateTime CreatedOn { get; private set; } = DateTime.UtcNow;
-    public DateTime ModifiedOn { get; private set; }
+
 
     public void UpdateName(string name)
     {
         IsValidateString(name);
         Name = name;
-        ModifiedOn = DateTime.UtcNow;
     }
 
     public void UpdateLastName(string lastName)
     {
         IsValidateString(lastName);
         LastName = lastName;
-        ModifiedOn = DateTime.UtcNow;
     }
 
     public void UpdateEmail(string email)
     {
         IsValidEmail(email);
         Email = email;
-        ModifiedOn = DateTime.UtcNow;
     }
 
+    public void IncreaseAmount(decimal amount)
+    {
+        if (amount < 0)
+            throw new ArgumentException($"'{nameof(amount)}' cannot be negative.", nameof(amount));
+        
+        Amount += amount;
+    }
+
+    public void DecreaseAmount(decimal amount)
+    {
+        if (amount < 0)
+            throw new ArgumentException($"'{nameof(amount)}' cannot be negative.", nameof(amount));
+        if (Amount - amount < 0)
+            throw new ArgumentException($"'{nameof(amount)}' cannot be negative.", nameof(amount));
+        
+        Amount -= amount;
+    }
+    
     public void UpdatePassword(string password)
     {
         IsValidPassword(password);
         Password = password;
-        ModifiedOn = DateTime.UtcNow;
     }
 
     public void UpdateGender(Gender gender)
     {
         Gender = gender;
-        ModifiedOn = DateTime.UtcNow;
     }
 
     public void UpdateBirthDate(DateTime birthDate)
     {
         BirthDate = birthDate;
-        ModifiedOn = DateTime.UtcNow;
     }
 
     public void UpdateRole(Role role)
     {
         Role = role;
-        ModifiedOn = DateTime.UtcNow;
     }
 
     public void UpdateStatus(ActiveStatus activeStatus)
     {
         ActiveStatus = activeStatus;
-        ModifiedOn = DateTime.UtcNow;
     }
     
     private static void IsValidateString(string field)
