@@ -25,7 +25,7 @@ public class CreateProductCommandHandler(IProductRepository repository, IUnitOfW
             var product = new Product(
                 command.Name,
                 command.Description,
-                command.Category,
+                command.ProductCategory,
                 command.Price,
                 command.Sku,
                 command.Stock);
@@ -37,7 +37,7 @@ public class CreateProductCommandHandler(IProductRepository repository, IUnitOfW
         }
         catch (Exception e)
         {
-            return ResponseViewModel<Guid>.Fail(e, 500);
+            return ResponseViewModel<Guid>.Fail(e.Message, 500);
         }
     }
 }

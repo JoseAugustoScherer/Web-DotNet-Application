@@ -5,7 +5,7 @@ namespace MyMarket.Application.Features.Products.Commands;
 public sealed record CreateProductCommand(
     string Name, 
     string Description, 
-    Category Category, 
+    Category ProductCategory, 
     decimal Price,
     string Sku,
     int Stock);
