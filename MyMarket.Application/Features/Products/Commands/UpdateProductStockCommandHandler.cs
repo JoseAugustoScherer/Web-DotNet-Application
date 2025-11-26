@@ -5,28 +5,20 @@ using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Products.Commands;
 
-public class UpdateProductStockCommandHandler : ICommandHandler<UpdateProductStockCommand, ResponseViewModel>
+using ICommandHandler = ICommandHandler<UpdateProductStockCommand, ResponseViewModel>;
+public class UpdateProductStockCommandHandler(IProductRepository repository, IUnitOfWork unitOfWork) : ICommandHandler
 {
-    private readonly IRepository<Product> _repository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public UpdateProductStockCommandHandler(IRepository<Product> repository, IUnitOfWork unitOfWork)
-    {
-        _repository = repository;
-        _unitOfWork = unitOfWork;
-    }
-    
     public async Task<ResponseViewModel> HandleAsync(UpdateProductStockCommand command)
     {
         try
         {
-            var product = await _repository.GetByIdAsync(command.Id);
+            var product = await repository.GetByIdAsync(command.Id);
         
             if (product == null)
                 return ResponseViewModel.Fail("Product not found", 404);
         
             product.UpdateStock(command.Stock);
-            await _unitOfWork.CommitAsync();
+            await unitOfWork.CommitAsync();
             
             return ResponseViewModel.Ok();
         }

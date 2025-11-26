@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Identity;
 using MyMarket.Application.Abstractions;
 using MyMarket.Application.Features.Users.DTOs;
 using MyMarket.Application.ViewModel;
-using MyMarket.Core.Entities;
 using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Users.Commands;
 
-public class LoginUserCommandHandler(IRepository<User> userRepository)
-    : ICommandHandler<LoginUserCommand, ResponseViewModel<LoginUserResponse>>
+using LoginHandler = ICommandHandler<LoginUserCommand, ResponseViewModel<LoginUserResponse>>;
+
+public class LoginUserCommandHandler(IUserRepository userRepository) : LoginHandler
 {
     public async Task<ResponseViewModel<LoginUserResponse>> HandleAsync(LoginUserCommand command)
     {

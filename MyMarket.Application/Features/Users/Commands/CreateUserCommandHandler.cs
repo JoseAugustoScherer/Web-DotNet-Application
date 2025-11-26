@@ -6,9 +6,9 @@ using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Users.Commands;
 
+using CreateHandler = ICommandHandler<CreateUserCommand, ResponseViewModel<Guid>>;
 
-
-public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, ResponseViewModel<Guid>>
+public class CreateUserCommandHandler : CreateHandler
 {
     private readonly IUserRepository _repository;
     private readonly IUnitOfWork _unitOfWork;

@@ -10,8 +10,6 @@ public sealed class Product(
     string sku,
     int stock) : BaseEntity
 {
-    
-    public Guid Id { get; private set; } =  Guid.NewGuid();
     public string Name { get; private set; } = name;
     public string Description { get; private set; }  = description;
     public Category Category { get; private set; } = category;

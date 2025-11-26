@@ -30,8 +30,7 @@ public class GetAllUsersQueryHandler : IQueryHandler<GetAllUsersQuery, ResponseV
                 u.Gender,
                 u.BirthDate,
                 u.Role,
-                u.ActiveStatus,
-                u.CreatedOn)).ToList();
+                u.ActiveStatus)).ToList();
 
             return ResponseViewModel<List<UserDto>>.Ok(userDto);
         }

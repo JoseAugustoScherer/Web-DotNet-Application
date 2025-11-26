@@ -5,28 +5,21 @@ using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Products.Commands;
 
-public class UpdateProductPriceCommandHandler : ICommandHandler<UpdateProductPriceCommand, ResponseViewModel>
-{
-    private readonly IRepository<Product> _repository;
-    private readonly IUnitOfWork _unitOfWork;
+using ICommandHandler = ICommandHandler<UpdateProductPriceCommand, ResponseViewModel>;
 
-    public UpdateProductPriceCommandHandler(IRepository<Product> repository, IUnitOfWork unitOfWork)
-    {
-        _repository = repository;
-        _unitOfWork = unitOfWork;
-    }
-    
+public class UpdateProductPriceCommandHandler(IProductRepository repository, IUnitOfWork unitOfWork) : ICommandHandler
+{
     public async Task<ResponseViewModel> HandleAsync(UpdateProductPriceCommand command)
     {
         try
         {
-            var product = await _repository.GetByIdAsync(command.Id);
+            var product = await repository.GetByIdAsync(command.Id);
         
             if (product is null)
                 return ResponseViewModel.Fail("Product not found", 404);
         
             product.UpdatePrice(command.Price);
-            await _unitOfWork.CommitAsync();
+            await unitOfWork.CommitAsync();
 
             return ResponseViewModel.Ok();
         }

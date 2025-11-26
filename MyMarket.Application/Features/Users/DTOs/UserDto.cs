@@ -11,6 +11,5 @@ public sealed record UserDto(
     Gender Gender,
     DateTime BirthDate,
     Role Role,
-    ActiveStatus ActiveStatus,
-    DateTime CreatedOn
+    ActiveStatus ActiveStatus
     );

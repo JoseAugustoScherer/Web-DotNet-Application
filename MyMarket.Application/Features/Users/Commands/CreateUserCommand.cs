@@ -14,5 +14,4 @@ public sealed record CreateUserCommand
     public DateTime BirthDate { get; init; }
     public Role Role { get; init; }
     public ActiveStatus ActiveStatus { get; init; }
-    public DateTime CreatedOn { get; init; }
 }

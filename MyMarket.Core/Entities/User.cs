@@ -14,7 +14,6 @@ public sealed class User(
     Role role,
     ActiveStatus activeStatus) : BaseEntity
 {
-    public Guid Id { get; private set; } = Guid.NewGuid();
     public string Name { get; private set; } = name;
     public string LastName { get; private set; } = lastName;
     public string Email { get; private set; } = email;

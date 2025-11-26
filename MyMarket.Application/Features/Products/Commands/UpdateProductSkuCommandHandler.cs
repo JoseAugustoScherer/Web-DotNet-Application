@@ -5,28 +5,21 @@ using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Products.Commands;
 
-public class UpdateProductSkuCommandHandler : ICommandHandler<UpdateProductSkuCommand, ResponseViewModel>
-{
-    private readonly IRepository<Product> _repository;
-    private readonly IUnitOfWork _unitOfWork;
+using ICommandHandler = ICommandHandler<UpdateProductSkuCommand, ResponseViewModel>;
 
-    public UpdateProductSkuCommandHandler(IRepository<Product> repository, IUnitOfWork unitOfWork)
-    {
-        _repository = repository;
-        _unitOfWork = unitOfWork;
-    }
-    
+public class UpdateProductSkuCommandHandler(IProductRepository repository, IUnitOfWork unitOfWork) : ICommandHandler
+{
     public async Task<ResponseViewModel> HandleAsync(UpdateProductSkuCommand command)
     {
         try
         {
-            var product = await _repository.GetByIdAsync(command.ProductId);
+            var product = await repository.GetByIdAsync(command.ProductId);
         
             if (product is null)
                 return ResponseViewModel.Fail("Product not found", 404);
         
             product.UpdateSku(command.Sku);
-            await _unitOfWork.CommitAsync();
+            await unitOfWork.CommitAsync();
             
             return ResponseViewModel.Ok();
         }

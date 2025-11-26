@@ -1,9 +1,7 @@
 using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using MyMarket.Application.Abstractions;
 using MyMarket.Application.Features.Products.Commands;
 using MyMarket.Application.Features.Products.Queries;
@@ -58,10 +56,9 @@ builder.Services.AddDbContext<MyMarketDbContext>(options =>
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddScoped<IRepository<Product>, Repository<Product>>();
-
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 //Query product handlers
 builder.Services.AddScoped<GetAllProductsQueryHandler>();
@@ -78,7 +75,8 @@ builder.Services.AddScoped<UpdateProductSkuCommandHandler>();
 builder.Services.AddScoped<UpdateProductPriceCommandHandler>();
 builder.Services.AddScoped<UpdateProductCategoryCommandHandler>();
 builder.Services.AddScoped<UpdateProductStockCommandHandler>();
-// Update Product handlers
+
+// Update User handlers
 builder.Services.AddScoped<ICommandHandler<CreateUserCommand, ResponseViewModel<Guid>>, CreateUserCommandHandler>();
 
 // Fluent Validation

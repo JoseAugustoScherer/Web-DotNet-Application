@@ -1,25 +1,27 @@
 using MyMarket.Application.Abstractions;
+using MyMarket.Application.Validators;
 using MyMarket.Application.ViewModel;
 using MyMarket.Core.Entities;
 using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Products.Commands;
 
-public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, ResponseViewModel<Guid>>
-{
-    private readonly IRepository<Product> _repository;
-    private readonly IUnitOfWork _unitOfWork;
-    
-    public CreateProductCommandHandler(IRepository<Product> productRepository, IUnitOfWork unitOfWork)
-    {
-        _repository = productRepository;
-        _unitOfWork = unitOfWork;
-    }
+using CreateHandler = ICommandHandler<CreateProductCommand, ResponseViewModel<Guid>>;
 
+public class CreateProductCommandHandler(IProductRepository repository, IUnitOfWork unitOfWork, ProductValidator validator) : CreateHandler
+{
     public async Task<ResponseViewModel<Guid>> HandleAsync(CreateProductCommand command)
     {
         try
         {
+            var validationResult = await validator.ValidateAsync(command);
+            
+            if (!validationResult.IsValid)
+            {
+                var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+                return ResponseViewModel<Guid>.Fail(errors, 400);
+            }
+            
             var product = new Product(
                 command.Name,
                 command.Description,
@@ -28,8 +30,8 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
                 command.Sku,
                 command.Stock);
         
-            await _repository.AddAsync(product);
-            await _unitOfWork.CommitAsync();
+            await repository.AddAsync(product);
+            await unitOfWork.CommitAsync();
             
             return ResponseViewModel<Guid>.Ok(product.Id);
         }
