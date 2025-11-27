@@ -1,35 +1,39 @@
 using System.Linq.Expressions;
 using Moq;
 using MyMarket.Application.Features.Products.Commands;
-using MyMarket.Application.Validators;
 using MyMarket.Core.Entities;
 using MyMarket.Core.Enums;
 using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarketTest.ProductUnitTest;
 
-public class CreateProductCommandHandlerTest
+public class UpdateProductDescriptionCommandHandlerTest
 {
-    private readonly CreateProductCommandHandler _sut;
+    private readonly UpdateProductDescriptionCommandHandler _sut;
     private readonly Mock<IProductRepository> _repository;
     private readonly Mock<IUnitOfWork> _unitOfWork;
-    private readonly ProductValidator _validator;
 
-    public CreateProductCommandHandlerTest()
+    public UpdateProductDescriptionCommandHandlerTest()
     {
         _repository = new Mock<IProductRepository>();
         _unitOfWork = new Mock<IUnitOfWork>();
-        _validator = new ProductValidator();
-        _sut = new CreateProductCommandHandler(_repository.Object, _unitOfWork.Object, _validator);
+        _sut = new UpdateProductDescriptionCommandHandler(_repository.Object, _unitOfWork.Object);
     }
 
     [Fact]
-    public async Task FailCreate()
+    public async Task FailUpdateProductDescriptionCommand()
     {
-        var command = new CreateProductCommand("", "Description", Category.Automotive, 19.99m, "SKU", 19);
-
-        var product = new Product("", "Description", Category.Automotive, 19.99m, "SKU", 19);
-
+        var productId = Guid.NewGuid();
+        var command = new UpdateProductDescriptionCommand(productId, (string)null);
+        
+        var product = new Product(
+            "Test", 
+            "Description", 
+            Category.Automotive, 
+            19.99m, 
+            "SKU", 
+            19);
+        
         _repository
             .Setup(p => p.GetItemByAsync(It.IsAny<Expression<Func<Product, bool>>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(product);
