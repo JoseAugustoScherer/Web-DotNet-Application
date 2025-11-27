@@ -23,14 +23,15 @@ public class GetProductByCategoryQueryHandler : IQueryHandler<GetProductByCatego
 
             var productsInCategory = allProducts.Where(p => p.Category == query.ProductCategory).ToList();
 
-            var productResponse = productsInCategory.Select(product => new ProductDto(
-                product.Id,
-                product.Name,
-                product.Description,
-                product.Category,
-                product.Price,
-                product.Sku,
-                product.Stock
+            var productResponse = productsInCategory.Select(p => new ProductDto(
+                p.Id,
+                p.Name,
+                p.Description,
+                p.Category,
+                p.Price,
+                p.Sku,
+                p.Stock,
+                p.CreatedOn
             )).ToList();
 
             return ResponseViewModel<List<ProductDto>>.Ok(productResponse);

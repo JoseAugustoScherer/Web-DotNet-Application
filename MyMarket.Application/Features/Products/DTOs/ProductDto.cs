@@ -9,4 +9,5 @@ public record ProductDto(
     Category ProductCategory,
     decimal Price,
     string Sku,
-    int Stock);
+    int Stock,
+    DateTime CreatedOn);

@@ -31,7 +31,8 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Res
                 product.Category,
                 product.Price,
                 product.Sku,
-                product.Stock);
+                product.Stock,
+                product.CreatedOn);
 
             return ResponseViewModel<ProductDto>.Ok(productResponse);
         }

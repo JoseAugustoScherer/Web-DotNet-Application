@@ -28,7 +28,8 @@ public class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQuery, Res
                 p.Category,
                 p.Price,
                 p.Sku,
-                p.Stock)).ToList();
+                p.Stock,
+                p.CreatedOn)).ToList();
         
             return ResponseViewModel<List<ProductDto>>.Ok(productsDto);
         }
