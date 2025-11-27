@@ -7,32 +7,32 @@ using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarketTest.ProductUnitTest;
 
-public class UpdateProductDescriptionCommandHandlerTest
+public class UpdateProductSkuCommandHandlerTest
 {
-    private readonly UpdateProductDescriptionCommandHandler _sut;
+    private readonly UpdateProductSkuCommandHandler _sut;
     private readonly Mock<IProductRepository> _repository;
     private readonly Mock<IUnitOfWork> _unitOfWork;
 
-    public UpdateProductDescriptionCommandHandlerTest()
+    public UpdateProductSkuCommandHandlerTest()
     {
         _repository = new Mock<IProductRepository>();
         _unitOfWork = new Mock<IUnitOfWork>();
-        _sut = new UpdateProductDescriptionCommandHandler(_repository.Object, _unitOfWork.Object);
+        _sut = new UpdateProductSkuCommandHandler(_repository.Object, _unitOfWork.Object);
     }
-
+    
     [Fact]
-    public async Task UpdateProductDescriptionCommandHandlerTest_Success_WhenDescriptionIsValid()
+    public async Task UpdateProductSkuCommandHandlerTest_Success_WhenSkuIsValid()
     {
         var productId = Guid.NewGuid();
-        const  string description = "TestDescription";
-        var command = new UpdateProductDescriptionCommand(productId, description);
+        const string newSku = "sku";
+        var command = new UpdateProductSkuCommand(productId, newSku);
 
         var product = new Product(
-            "Test", 
-            "Description", 
-            Category.Automotive, 
-            19.99m, 
-            "SKU", 
+            "Test",
+            "Description",
+            Category.Automotive,
+            19.99m,
+            "SKU",
             19);
         
         _repository
@@ -42,26 +42,26 @@ public class UpdateProductDescriptionCommandHandlerTest
         var result = await _sut.HandleAsync(command);
         
         result.IsSuccess.Should().BeTrue("The operation should succeed");
-        product.Description.Should().Be(description, "The description should be updated");
+        product.Sku.Should().Be(newSku, "The sku should be updated");
         
-        _repository.Verify(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()), Times.Once());
+        _repository.Verify(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()), Times.Once);
         
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
     
     [Fact]
-    public async Task UpdateProductDescriptionCommandHandlerTest_Failure_WhenDescriptionInvalid()
+    public async Task UpdateProductSkuCommandHandlerTest_Success_WhenSkuIsInvalid()
     {
         var productId = Guid.NewGuid();
-        const string description = "";
-        var command = new UpdateProductDescriptionCommand(productId, description);
-        
+        const string newSku = "";
+        var command = new UpdateProductSkuCommand(productId, newSku);
+
         var product = new Product(
-            "Test", 
-            "Description", 
-            Category.Automotive, 
-            19.99m, 
-            "SKU", 
+            "Test",
+            "Description",
+            Category.Automotive,
+            19.99m,
+            "SKU",
             19);
         
         _repository
@@ -70,10 +70,10 @@ public class UpdateProductDescriptionCommandHandlerTest
         
         var result = await _sut.HandleAsync(command);
         
-        result.IsFailure.Should().BeTrue("The description cannot be invalid");
+        result.IsFailure.Should().BeTrue("The Sku cannot be empty");
         
         _repository.Verify(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()), Times.Once);
-    
+        
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 }

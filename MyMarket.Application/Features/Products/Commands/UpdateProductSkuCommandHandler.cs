@@ -13,13 +13,13 @@ public class UpdateProductSkuCommandHandler(IProductRepository repository, IUnit
     {
         try
         {
-            var product = await repository.GetByIdAsync(command.ProductId);
+            var product = await repository.GetByIdAsync(command.ProductId, null);
         
             if (product is null)
                 return ResponseViewModel.Fail("Product not found", 404);
         
             product.UpdateSku(command.Sku);
-            await unitOfWork.CommitAsync();
+            await unitOfWork.CommitAsync(CancellationToken.None);
             
             return ResponseViewModel.Ok();
         }

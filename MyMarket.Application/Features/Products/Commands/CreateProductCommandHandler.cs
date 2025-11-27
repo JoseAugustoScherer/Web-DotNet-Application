@@ -30,8 +30,8 @@ public class CreateProductCommandHandler(IProductRepository repository, IUnitOfW
                 command.Sku,
                 command.Stock);
         
-            await repository.AddAsync(product);
-            await unitOfWork.CommitAsync();
+            await repository.AddAsync(product, null);
+            await unitOfWork.CommitAsync(CancellationToken.None);
             
             return ResponseViewModel<Guid>.Ok(product.Id);
         }

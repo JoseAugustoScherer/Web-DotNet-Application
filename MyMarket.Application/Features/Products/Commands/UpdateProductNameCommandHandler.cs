@@ -13,13 +13,13 @@ public class UpdateProductNameCommandHandler(IProductRepository repository, IUni
     {
         try
         {
-            var product = await repository.GetByIdAsync(command.Id);
+            var product = await repository.GetByIdAsync(command.Id, null);
 
             if (product is null)
                 ResponseViewModel.Fail("Product not found", 404);
         
             product.UpdateName(command.Name);
-            await unitOfWork.CommitAsync();
+            await unitOfWork.CommitAsync(CancellationToken.None);
 
             return ResponseViewModel.Ok();
         }

@@ -39,8 +39,8 @@ public class CreateUserCommandHandler : CreateHandler
                 command.Role,
                 command.ActiveStatus);
             
-            await _repository.AddAsync(user);
-            await _unitOfWork.CommitAsync();
+            await _repository.AddAsync(user, null);
+            await _unitOfWork.CommitAsync(CancellationToken.None);
             
             return ResponseViewModel<Guid>.Ok(user.Id);
         }

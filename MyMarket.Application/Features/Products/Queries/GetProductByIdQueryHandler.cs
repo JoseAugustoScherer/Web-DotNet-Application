@@ -19,7 +19,7 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Res
     {
         try
         {
-            var product = await _repository.GetByIdAsync(query.ProductId);
+            var product = await _repository.GetByIdAsync(query.ProductId, null);
 
             if (product is null)
                 return ResponseViewModel<ProductDto>.Fail("Product not found", 404);

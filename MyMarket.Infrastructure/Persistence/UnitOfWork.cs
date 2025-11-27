@@ -13,4 +13,9 @@ public class UnitOfWork : IUnitOfWork
     }
     
     public Task<int> CommitAsync() => _dbContext.SaveChangesAsync();
+    
+    public Task<int> CommitAsync(CancellationToken cancellationToken)
+    {
+        return _dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

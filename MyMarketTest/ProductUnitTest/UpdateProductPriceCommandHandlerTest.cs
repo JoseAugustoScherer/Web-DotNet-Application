@@ -7,25 +7,25 @@ using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarketTest.ProductUnitTest;
 
-public class UpdateProductDescriptionCommandHandlerTest
+public class UpdateProductPriceCommandHandlerTest
 {
-    private readonly UpdateProductDescriptionCommandHandler _sut;
+    private readonly UpdateProductPriceCommandHandler _sut;
     private readonly Mock<IProductRepository> _repository;
     private readonly Mock<IUnitOfWork> _unitOfWork;
 
-    public UpdateProductDescriptionCommandHandlerTest()
+    public UpdateProductPriceCommandHandlerTest()
     {
         _repository = new Mock<IProductRepository>();
         _unitOfWork = new Mock<IUnitOfWork>();
-        _sut = new UpdateProductDescriptionCommandHandler(_repository.Object, _unitOfWork.Object);
+        _sut = new UpdateProductPriceCommandHandler(_repository.Object, _unitOfWork.Object);
     }
-
+    
     [Fact]
-    public async Task UpdateProductDescriptionCommandHandlerTest_Success_WhenDescriptionIsValid()
+    public async Task UpdateProductPriceCommandHandlerTest_Success_WhenPriceIsPositive()
     {
         var productId = Guid.NewGuid();
-        const  string description = "TestDescription";
-        var command = new UpdateProductDescriptionCommand(productId, description);
+        var newPrice = 10.00m;
+        var command = new UpdateProductPriceCommand(productId, newPrice);
 
         var product = new Product(
             "Test", 
@@ -42,20 +42,22 @@ public class UpdateProductDescriptionCommandHandlerTest
         var result = await _sut.HandleAsync(command);
         
         result.IsSuccess.Should().BeTrue("The operation should succeed");
-        product.Description.Should().Be(description, "The description should be updated");
+        product.Price.Should().Be(newPrice, "The price should be updated");
         
-        _repository.Verify(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()), Times.Once());
+        _repository
+            .Verify(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()), 
+                Times.Once());
         
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
     
     [Fact]
-    public async Task UpdateProductDescriptionCommandHandlerTest_Failure_WhenDescriptionInvalid()
+    public async Task UpdateProductPriceCommandHandlerTest_Failure_WhenPriceIsNegative()
     {
         var productId = Guid.NewGuid();
-        const string description = "";
-        var command = new UpdateProductDescriptionCommand(productId, description);
-        
+        const decimal invalidPrice = -10.00m;
+        var command = new UpdateProductPriceCommand(productId, invalidPrice);
+
         var product = new Product(
             "Test", 
             "Description", 
@@ -70,9 +72,9 @@ public class UpdateProductDescriptionCommandHandlerTest
         
         var result = await _sut.HandleAsync(command);
         
-        result.IsFailure.Should().BeTrue("The description cannot be invalid");
+        result.IsFailure.Should().BeTrue("The price cannot be negative");
         
-        _repository.Verify(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()), Times.Once);
+        _repository.Verify(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()), Times.Once());
     
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
