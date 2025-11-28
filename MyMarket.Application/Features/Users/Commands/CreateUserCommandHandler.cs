@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using MyMarket.Application.Abstractions;
+using MyMarket.Application.Validators;
 using MyMarket.Application.ViewModel;
 using MyMarket.Core.Entities;
 using MyMarket.Core.Repositories.Interfaces;
@@ -8,39 +9,33 @@ namespace MyMarket.Application.Features.Users.Commands;
 
 using CreateHandler = ICommandHandler<CreateUserCommand, ResponseViewModel<Guid>>;
 
-public class CreateUserCommandHandler : CreateHandler
+public class CreateUserCommandHandler(IUserRepository repository, IUnitOfWork unitOfWork, UserValidator validator) : CreateHandler
 {
-    private readonly IUserRepository _repository;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly PasswordHasher<string> _hasher;
-
-    public CreateUserCommandHandler(IUserRepository repository, IUnitOfWork unitOfWork)
-    {
-        _repository = repository;
-        _unitOfWork = unitOfWork;
-        _hasher = new PasswordHasher<string>();
-        
-    }
-    
     public async Task<ResponseViewModel<Guid>> HandleAsync(CreateUserCommand command)
     {
         try
         {
-            string password = _hasher.HashPassword(null, command.Password);
-            
+            var validationResult = await validator.ValidateAsync(command);
+
+            if (!validationResult.IsValid)
+            {
+                var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+                return ResponseViewModel<Guid>.Fail(errors, 400);
+            }
+
             var user = new User(
                 command.Name,
                 command.LastName,
                 command.Email,
                 command.Amount,
-                password,
+                command.Password,
                 command.Gender,
                 command.BirthDate,
                 command.Role,
                 command.ActiveStatus);
             
-            await _repository.AddAsync(user, CancellationToken.None);
-            await _unitOfWork.CommitAsync(CancellationToken.None);
+            await repository.AddAsync(user, CancellationToken.None);
+            await unitOfWork.CommitAsync(CancellationToken.None);
             
             return ResponseViewModel<Guid>.Ok(user.Id);
         }

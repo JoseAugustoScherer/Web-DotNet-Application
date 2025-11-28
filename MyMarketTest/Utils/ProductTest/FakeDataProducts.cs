@@ -16,7 +16,7 @@ public static class FakeDataProducts
             .RuleFor(p => p.Description, 
                 f => f.Commerce.ProductDescription())
             .RuleFor(p => p.Category, 
-                f => f.PickRandom<Category>())
+                f => f.Random.Enum<Category>())
             .RuleFor(p => p.Price, 
                 f => f.Random.Decimal(1, 2000))
             .RuleFor(p => p.Sku, 

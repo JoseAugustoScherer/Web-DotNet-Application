@@ -20,7 +20,7 @@ public class UserValidator : AbstractValidator<CreateUserCommand>
             .MinimumLength(3).WithMessage("Last name must be between 3 and 50 characters")
             .MaximumLength(50).WithMessage("Last name must be between 3 and 50 characters");
         
-        const string emailRegex = @"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
+        const string emailRegex = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
         
         RuleFor(user => user.Email)
               .NotEmpty().WithMessage("Email is required")

@@ -3,25 +3,43 @@ using MyMarket.Core.Enums;
 
 namespace MyMarket.Core.Entities;
 
-public sealed class User(
-    string name,
-    string lastName,
-    string email,
-    decimal amount,
-    string password,
-    Gender gender,
-    DateTime birthDate,
-    Role role,
-    ActiveStatus activeStatus) : BaseEntity
+public sealed class User : BaseEntity
 {
-    public string Name { get; private set; } = name;
-    public string LastName { get; private set; } = lastName;
-    public string Email { get; private set; } = email;
-    public decimal Amount { get; private set; } = amount;
-    public string Password { get; private set; } = password;
-    public Gender Gender { get; private set; } = gender;
-    public DateTime BirthDate { get; private set; } = birthDate;
-    public Role Role { get; private set; } = role;
+    public User()
+    {
+        
+    }
+    
+    public User(
+        string name,
+        string lastName,
+        string email,
+        decimal amount,
+        string password,
+        Gender gender,
+        DateTime birthDate,
+        Role role,
+        ActiveStatus activeStatus)
+    {
+        Name = name;
+        LastName = lastName;
+        Email = email;
+        Amount = amount;
+        Password = password;
+        Gender = gender;
+        BirthDate = birthDate;
+        Role = role;
+        ActiveStatus = activeStatus;
+    }
+    
+    public string Name { get; private set; }
+    public string LastName { get; private set; }
+    public string Email { get; private set; }
+    public decimal Amount { get; private set; }
+    public string Password { get; private set; }
+    public Gender Gender { get; private set; }
+    public DateTime BirthDate { get; private set; }
+    public Role Role { get; private set; }
     public ActiveStatus ActiveStatus { get; set; } =  ActiveStatus.Active;
 
 
