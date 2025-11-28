@@ -1,10 +1,11 @@
 using System.Linq.Expressions;
+using FluentAssertions;
 using Moq;
 using MyMarket.Application.Features.Products.Commands;
 using MyMarket.Application.Validators;
 using MyMarket.Core.Entities;
-using MyMarket.Core.Enums;
 using MyMarket.Core.Repositories.Interfaces;
+using MyMarketTest.Utils.ProductTest;
 
 namespace MyMarketTest.ProductUnitTest;
 
@@ -24,18 +25,35 @@ public class CreateProductCommandHandlerTest
     }
 
     [Fact]
-    public async Task FailCreate()
+    public async Task Handle_ShouldCreateProduct_WhenProductDoesNotExist()
     {
-        var command = new CreateProductCommand("", "Description", Category.Automotive, 19.99m, "SKU", 19);
-
-        var product = new Product("", "Description", Category.Automotive, 19.99m, "SKU", 19);
-
-        _repository
-            .Setup(p => p.GetItemByAsync(It.IsAny<Expression<Func<Product, bool>>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(product);
+        var fakeProduct = FakeDataProducts.FakeProductList(1).First();
+    
+        var command = new CreateProductCommand(
+            fakeProduct.Name,
+            fakeProduct.Description,
+            fakeProduct.Category,
+            fakeProduct.Price,
+            fakeProduct.Sku,
+            fakeProduct.Stock);
+        
+        _repository.Setup(p => p.GetItemByAsync(It.IsAny<Expression<Func<Product, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => null!);
         
         var result = await _sut.HandleAsync(command);
         
-        Assert.True(result.IsFailure);
+        result.IsSuccess.Should().BeTrue();
+        
+        _repository.Verify(r => r.AddAsync(
+                It.Is<Product>(p => 
+                    p.Name == fakeProduct.Name &&
+                    p.Description == fakeProduct.Description &&
+                    p.Category == fakeProduct.Category &&
+                    p.Price == fakeProduct.Price &&
+                    p.Sku == fakeProduct.Sku &&
+                    p.Stock == fakeProduct.Stock
+                ), It.IsAny<CancellationToken>()), 
+            Times.Once);
+        
+        _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }

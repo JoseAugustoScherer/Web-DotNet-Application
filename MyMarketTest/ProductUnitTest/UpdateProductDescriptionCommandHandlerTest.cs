@@ -1,9 +1,8 @@
 using FluentAssertions;
 using Moq;
 using MyMarket.Application.Features.Products.Commands;
-using MyMarket.Core.Entities;
-using MyMarket.Core.Enums;
 using MyMarket.Core.Repositories.Interfaces;
+using MyMarketTest.Utils.ProductTest;
 
 namespace MyMarketTest.ProductUnitTest;
 
@@ -23,28 +22,19 @@ public class UpdateProductDescriptionCommandHandlerTest
     [Fact]
     public async Task UpdateProductDescriptionCommandHandlerTest_Success_WhenDescriptionIsValid()
     {
-        var productId = Guid.NewGuid();
-        const  string description = "TestDescription";
-        var command = new UpdateProductDescriptionCommand(productId, description);
-
-        var product = new Product(
-            "Test", 
-            "Description", 
-            Category.Automotive, 
-            19.99m, 
-            "SKU", 
-            19);
+        var fakeProduct = FakeDataProducts.FakeProductList(1).First();
+        const string newDescription = "New description";
+        var command = new UpdateProductDescriptionCommand(fakeProduct.Id, newDescription);
         
-        _repository
-            .Setup(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()))
-            .ReturnsAsync(product);
+        _repository.Setup(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>())).ReturnsAsync(fakeProduct);
         
         var result = await _sut.HandleAsync(command);
         
-        result.IsSuccess.Should().BeTrue("The operation should succeed");
-        product.Description.Should().Be(description, "The description should be updated");
+        result.IsSuccess.Should().BeTrue();
         
-        _repository.Verify(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()), Times.Once());
+        _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once());
+        
+        fakeProduct.Description.Should().Be(newDescription);
         
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -52,27 +42,19 @@ public class UpdateProductDescriptionCommandHandlerTest
     [Fact]
     public async Task UpdateProductDescriptionCommandHandlerTest_Failure_WhenDescriptionInvalid()
     {
-        var productId = Guid.NewGuid();
-        const string description = "";
-        var command = new UpdateProductDescriptionCommand(productId, description);
+        var fakeProduct = FakeDataProducts.FakeProductList(1).First();
+        const string newDescription = "";
+        var command = new UpdateProductDescriptionCommand(fakeProduct.Id, newDescription);
         
-        var product = new Product(
-            "Test", 
-            "Description", 
-            Category.Automotive, 
-            19.99m, 
-            "SKU", 
-            19);
-        
-        _repository
-            .Setup(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()))
-            .ReturnsAsync(product);
+        _repository.Setup(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>())).ReturnsAsync(fakeProduct);
         
         var result = await _sut.HandleAsync(command);
         
-        result.IsFailure.Should().BeTrue("The description cannot be invalid");
+        result.IsFailure.Should().BeTrue();
         
-        _repository.Verify(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()), Times.Once);
+        _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once);
+        
+        fakeProduct.Description.Should().NotBe(newDescription);
     
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
     }

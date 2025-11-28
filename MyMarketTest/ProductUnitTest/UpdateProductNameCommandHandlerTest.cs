@@ -1,9 +1,8 @@
 using FluentAssertions;
 using Moq;
 using MyMarket.Application.Features.Products.Commands;
-using MyMarket.Core.Entities;
-using MyMarket.Core.Enums;
 using MyMarket.Core.Repositories.Interfaces;
+using MyMarketTest.Utils.ProductTest;
 
 namespace MyMarketTest.ProductUnitTest;
 
@@ -23,29 +22,19 @@ public class UpdateProductNameCommandHandlerTest
     [Fact]
     public async Task UpdateProductNameCommandHandlerTest_Success_WhenNameIsComplete()
     {
-        var productId =  Guid.NewGuid();
+        var fakeProduct = FakeDataProducts.FakeProductList(1).First();
         const string newName = "Test";
-        var command = new UpdateProductNameCommand(productId, newName);
+        var command = new UpdateProductNameCommand(fakeProduct.Id, newName);
 
-        var product = new Product(
-            "Test",
-            "Description",
-            Category.Automotive,
-            19.99m,
-            "SKU",
-            19);
-
-        _repository
-            .Setup(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()))
-            .ReturnsAsync(product);
+        _repository.Setup(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>())).ReturnsAsync(fakeProduct);
         
         var result = await _sut.HandleAsync(command);
         
         result.IsSuccess.Should().BeTrue();
     
-        _repository
-            .Verify(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()), 
-                Times.Once());
+        _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once());
+        
+        fakeProduct.Name.Should().Be(newName);
         
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -53,27 +42,17 @@ public class UpdateProductNameCommandHandlerTest
     [Fact]
     public async Task UpdateProductNameCommandHandlerTest_Failure_WhenNameIsEmpty()
     {
-        var productId =  Guid.NewGuid();
+        var fakeProduct = FakeDataProducts.FakeProductList(1).First();
         const string newName = "";
-        var command = new UpdateProductNameCommand(productId, newName);
+        var command = new UpdateProductNameCommand(fakeProduct.Id, newName);
 
-        var product = new Product(
-            "Test",
-            "Description",
-            Category.Automotive,
-            19.99m,
-            "SKU",
-            19);
-
-        _repository
-            .Setup(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()))
-            .ReturnsAsync(product);
+        _repository.Setup(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>())).ReturnsAsync(fakeProduct);
         
         var result = await _sut.HandleAsync(command);
         
         result.IsFailure.Should().BeTrue("The name cannot be empty");
         
-        _repository.Verify(p => p.GetByIdAsync(productId, It.IsAny<CancellationToken?>()), Times.Once);
+        _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once);
     
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
     }

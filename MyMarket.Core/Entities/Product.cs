@@ -2,21 +2,37 @@ using MyMarket.Core.Enums;
 
 namespace MyMarket.Core.Entities;
 
-public sealed class Product(
-    string name,
-    string description,
-    Category category,
-    decimal price,
-    string sku,
-    int stock) : BaseEntity
+public sealed class Product : BaseEntity
 {
-    public string Name { get; private set; } = name;
-    public string Description { get; private set; }  = description;
-    public Category Category { get; private set; } = category;
-    public decimal Price { get; private set; } = price;
-    public string Sku { get; private set; }  = sku;
-    public int Stock { get; private set; } =  stock;
 
+    public Product()
+    {
+        
+    }
+    
+    public Product(
+        string name,
+        string description,
+        Category category,
+        decimal price,
+        string sku,
+        int stock)
+    {
+        Name = name;
+        Description = description;
+        Category = category;
+        Price = price;
+        Sku = sku;
+        Stock = stock;
+    }
+    
+    public string Name { get; private set; }
+    public string Description { get; private set; }
+    public Category Category { get; private set; }
+    public decimal Price { get; private set; }
+    public string Sku { get; private set; }
+    public int Stock { get; private set; }
+    
     public void UpdateName(
         string name)
     {

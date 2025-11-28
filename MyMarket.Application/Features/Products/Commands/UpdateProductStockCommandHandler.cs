@@ -12,7 +12,7 @@ public class UpdateProductStockCommandHandler(IProductRepository repository, IUn
     {
         try
         {
-            var product = await repository.GetByIdAsync(command.Id, null);
+            var product = await repository.GetByIdAsync(command.Id, CancellationToken.None);
         
             if (product == null)
                 return ResponseViewModel.Fail("Product not found", 404);

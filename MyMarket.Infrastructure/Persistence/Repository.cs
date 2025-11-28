@@ -13,12 +13,12 @@ public class Repository<TEntity>(MyMarketDbContext dbContext) : IRepository<TEnt
         return await _dbSet.ToListAsync();
     }
 
-    public async Task<TEntity?> GetByIdAsync(Guid id, CancellationToken? cancellationToken)
+    public async Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _dbSet.FindAsync(id);
     }
 
-    public async Task AddAsync(TEntity entity, CancellationToken? cancellationToken)
+    public async Task AddAsync(TEntity entity, CancellationToken cancellationToken)
     {
         _dbSet.Add(entity);
     }
