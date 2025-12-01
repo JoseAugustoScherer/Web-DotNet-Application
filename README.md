@@ -8,7 +8,7 @@
 - SQLite;
 - EF;
 - Layers Architecture;
-- Bogu Fake Data;
+- Bogus Fake Data;
 
 ### Running
 
