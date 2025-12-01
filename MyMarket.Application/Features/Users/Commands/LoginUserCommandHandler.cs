@@ -15,7 +15,7 @@ public class LoginUserCommandHandler(IUserRepository userRepository) : LoginHand
     {
         try
         {
-            var user =  await userRepository.GetItemByAsync(x => x.Email == command.Email, default);
+            var user =  await userRepository.GetItemByAsync(x => x.Email == command.Email, CancellationToken.None);
 
             if (user is null)
                 return ResponseViewModel<LoginUserResponse>.Fail("User not found", StatusCodes.Status404NotFound);

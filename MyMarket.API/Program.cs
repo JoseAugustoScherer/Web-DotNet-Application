@@ -70,6 +70,7 @@ builder.Services.AddScoped<GetAllUsersQueryHandler>();
 // Update Product handlers
 builder.Services.AddScoped<CreateProductCommandHandler>();
 builder.Services.AddScoped<UpdateProductNameCommandHandler>();
+builder.Services.AddScoped<DeleteProductCommandHandler>();
 builder.Services.AddScoped<UpdateProductDescriptionCommandHandler>();
 builder.Services.AddScoped<UpdateProductSkuCommandHandler>();
 builder.Services.AddScoped<UpdateProductPriceCommandHandler>();
@@ -157,7 +158,17 @@ app.MapGet("/api/products/category/{category}", async (Category category, GetPro
     
     return Results.Ok(product);
 });
-
+// Delete
+app.MapDelete("/api/products/{id}/delete", async (Guid id, DeleteProductCommandHandler handler) =>
+{
+    var command = new DeleteProductCommand(id);
+    var result = await handler.HandleAsync(command);
+   
+    if(result.IsSuccess)
+        return Results.NoContent();
+    
+    return Results.StatusCode(result.StatusCode);
+});
 app.MapPatch("/api/products/{id}/name", async (Guid id, UpdateProductInputModel input, UpdateProductNameCommandHandler handler) => 
 {
     var command = new UpdateProductNameCommand(id, input.Name);
