@@ -39,9 +39,6 @@ public class CreateUserCommandHandlerTest
             fakeUser.BirthDate,
             fakeUser.Role,
             fakeUser.ActiveStatus);
-
-        var userConsole = new UserConsoleOutPut();
-        userConsole.ConsoleOutput(fakeUser);
         
         _repository.Setup(x => x.GetItemByAsync(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => null!);
         

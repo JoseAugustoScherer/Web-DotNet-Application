@@ -12,6 +12,13 @@ public class UpdateUserBirthDateCommandHandler(IUserRepository repository, IUnit
     {
         try
         {
+            if(command.BirthDate > DateTime.Now)
+                return ResponseViewModel.Fail($"Birth date {command.BirthDate} is in the future", 400);
+            if (command.BirthDate >  DateTime.Now.AddYears(-18))
+                return ResponseViewModel.Fail("User must be at least 18 year", 400);
+            if (command.BirthDate.Year < 1900)
+                return ResponseViewModel.Fail("Are you a Vampire? I don't think so.", 400);
+            
             var product = await repository.GetByIdAsync(command.Id, CancellationToken.None);
             
             if(product is null)

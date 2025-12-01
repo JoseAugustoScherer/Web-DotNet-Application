@@ -1,5 +1,6 @@
 using MyMarket.Application.Abstractions;
 using MyMarket.Application.ViewModel;
+using MyMarket.Core.Enums;
 using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Users.Commands;
@@ -10,6 +11,11 @@ public class UpdateUserRoleCommandHandler(IUserRepository repository, IUnitOfWor
     {
         try
         {
+            if (!Enum.IsDefined(typeof(Role), command.Role))
+            {
+                return ResponseViewModel.Fail("Invalid ROLE value", 404);
+            }
+            
             var product = await repository.GetByIdAsync(command.Id, CancellationToken.None);
 
             if (product is null)

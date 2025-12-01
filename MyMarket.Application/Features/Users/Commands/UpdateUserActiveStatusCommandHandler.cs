@@ -1,17 +1,23 @@
 using MyMarket.Application.Abstractions;
 using MyMarket.Application.ViewModel;
+using MyMarket.Core.Enums;
 using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Users.Commands;
 
-using ICommandHandler = ICommandHandler<UpdateUserStatusCommand, ResponseViewModel>;
+using ICommandHandler = ICommandHandler<UpdateUserActiveStatusCommand, ResponseViewModel>;
 
-public class UpdateUserStatusCommandHandler(IUserRepository repository, IUnitOfWork unitOfWork) : ICommandHandler
+public class UpdateUserActiveStatusCommandHandler(IUserRepository repository, IUnitOfWork unitOfWork) : ICommandHandler
 {
-    public async Task<ResponseViewModel> HandleAsync(UpdateUserStatusCommand command)
+    public async Task<ResponseViewModel> HandleAsync(UpdateUserActiveStatusCommand command)
     {
         try
         {
+            if (!Enum.IsDefined(typeof(ActiveStatus), command.ActiveStatus))
+            {
+                return ResponseViewModel.Fail("Invalid ACTIVE STATUS value", 404);
+            }
+            
             var product = await repository.GetByIdAsync(command.Id, CancellationToken.None);
 
             if (product is null)

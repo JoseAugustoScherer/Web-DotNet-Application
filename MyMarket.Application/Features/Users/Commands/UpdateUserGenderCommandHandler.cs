@@ -1,5 +1,6 @@
 using MyMarket.Application.Abstractions;
 using MyMarket.Application.ViewModel;
+using MyMarket.Core.Enums;
 using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Users.Commands;
@@ -12,6 +13,11 @@ public class UpdateUserGenderCommandHandler(IUserRepository repository, IUnitOfW
     {
         try
         {
+            if (!Enum.IsDefined(typeof(Gender), command.Gender))
+            {
+                return ResponseViewModel.Fail("Invalid GENDER value", 404);
+            }
+            
             var product = await repository.GetByIdAsync(command.Id, CancellationToken.None);
             
             if (product is null)
