@@ -85,6 +85,18 @@ builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 
+// Cors Configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 // Pode colocar no Program.cs ou em um arquivo separado
 
 var app = builder.Build();
@@ -97,6 +109,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Cors 
+app.UseCors("AllowFrontend");
+
 // app.UseAuthentication();
 // app.UseAuthorization();
 
