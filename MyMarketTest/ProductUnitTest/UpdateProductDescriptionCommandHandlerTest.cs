@@ -34,9 +34,9 @@ public class UpdateProductDescriptionCommandHandlerTest
         
         _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once());
         
-        fakeProduct.Description.Should().Be(newDescription);
-        
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+        
+        fakeProduct.Description.Should().Be(newDescription);
     }
     
     [Fact]
@@ -53,9 +53,9 @@ public class UpdateProductDescriptionCommandHandlerTest
         result.IsFailure.Should().BeTrue();
         
         _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once);
-        
-        fakeProduct.Description.Should().NotBe(newDescription);
     
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+        
+        fakeProduct.Description.Should().NotBe(newDescription);
     }
 }

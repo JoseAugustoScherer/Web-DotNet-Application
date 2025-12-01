@@ -34,9 +34,9 @@ public class UpdateProductSkuCommandHandlerTest
         
         _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once);
         
-        fakeProduct.Sku.Should().Be(newSku, "The sku should be updated");
-        
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+        
+        fakeProduct.Sku.Should().Be(newSku, "The sku should be updated");
     }
     
     [Fact]
@@ -55,5 +55,7 @@ public class UpdateProductSkuCommandHandlerTest
         _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once);
         
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+        
+        fakeProduct.Sku.Should().NotBe(newSku, "The sku should be updated");
     }
 }

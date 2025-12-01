@@ -34,9 +34,9 @@ public class UpdateProductPriceCommandHandlerTest
         
         _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once());
         
-        fakeProduct.Price.Should().Be(newPrice, "The price should be updated");
-        
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+        
+        fakeProduct.Price.Should().Be(newPrice, "The price should be updated");
     }
     
     [Fact]
@@ -55,5 +55,7 @@ public class UpdateProductPriceCommandHandlerTest
         _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once());
     
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+        
+        fakeProduct.Price.Should().NotBe(newPrice, "The price should be updated");
     }
 }

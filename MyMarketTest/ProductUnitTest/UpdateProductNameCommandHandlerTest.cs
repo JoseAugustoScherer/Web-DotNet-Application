@@ -34,9 +34,9 @@ public class UpdateProductNameCommandHandlerTest
     
         _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once());
         
-        fakeProduct.Name.Should().Be(newName);
-        
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+        
+        fakeProduct.Name.Should().Be(newName);
     }
     
     [Fact]
@@ -55,5 +55,7 @@ public class UpdateProductNameCommandHandlerTest
         _repository.Verify(p => p.GetByIdAsync(fakeProduct.Id, It.IsAny<CancellationToken>()), Times.Once);
     
         _unitOfWork.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+        
+        fakeProduct.Name.Should().NotBe(newName);
     }
 }

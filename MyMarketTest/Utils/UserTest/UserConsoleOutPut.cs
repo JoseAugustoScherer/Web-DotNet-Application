@@ -8,7 +8,7 @@ public class UserConsoleOutPut
 {
     public void ConsoleOutput(User user)
     {
-        Console.WriteLine("\n\n=== FAKE DATA OF FAKE PRODUCT ===");
+        Console.WriteLine("\n\n=== FAKE DATA OF FAKE USER ===");
         Console.WriteLine($"ID: {user.Id}");
         Console.WriteLine($"Name: {user.Name}");
         Console.WriteLine($"LastName: {user.LastName}");
