@@ -217,7 +217,8 @@ app.MapPatch("/api/products/{id}/name", async (Guid id, UpdateProductInputModel 
     {
         return Results.NotFound(e.Message);
     }
-});
+})
+.RequireAuthorization();
 
 app.MapPatch("/api/products/{id}/description", async (Guid id, UpdateProductInputModel input, UpdateProductDescriptionCommandHandler handler) => 
 {
@@ -232,7 +233,8 @@ app.MapPatch("/api/products/{id}/description", async (Guid id, UpdateProductInpu
     {
         return Results.NotFound(e.Message);
     }
-});
+})
+.RequireAuthorization();
 
 app.MapPatch("/api/products/{id}/sku", async (Guid id, UpdateProductInputModel input, UpdateProductSkuCommandHandler handler) => 
 {
@@ -247,7 +249,8 @@ app.MapPatch("/api/products/{id}/sku", async (Guid id, UpdateProductInputModel i
     {
         return Results.NotFound(e.Message);
     }
-});
+})
+.RequireAuthorization();
 
 app.MapPatch("/api/products/{id}/price", async (Guid id, UpdateProductInputModel input, UpdateProductPriceCommandHandler handler) => 
 {
@@ -262,7 +265,8 @@ app.MapPatch("/api/products/{id}/price", async (Guid id, UpdateProductInputModel
     {
         return Results.NotFound(e.Message);
     }
-});
+})
+.RequireAuthorization();
 
 app.MapPatch("/api/products/{id}/category", async (Guid id, UpdateProductInputModel input, UpdateProductCategoryCommandHandler handler) => 
 {
@@ -277,7 +281,8 @@ app.MapPatch("/api/products/{id}/category", async (Guid id, UpdateProductInputMo
     {
         return Results.NotFound(e.Message);
     }
-});
+})
+.RequireAuthorization();
 
 app.MapPatch("/api/products/{id}/stock", async (Guid id, UpdateProductInputModel input, UpdateProductStockCommandHandler handler) => 
 {
@@ -292,7 +297,8 @@ app.MapPatch("/api/products/{id}/stock", async (Guid id, UpdateProductInputModel
     {
         return Results.NotFound(e.Message);
     }
-});
+})
+.RequireAuthorization();
 
 // USER
 app.MapPost("/api/users", async (CreateUserCommand command, ICommandHandler<CreateUserCommand, ResponseViewModel<Guid>> handler, IValidator<CreateUserCommand> validator) => 
@@ -307,7 +313,8 @@ app.MapPost("/api/users", async (CreateUserCommand command, ICommandHandler<Crea
     var userId = await handler.HandleAsync(command);
     
     return Results.Created($"/api/users/{userId}", new { Id = userId });
-});
+})
+.RequireAuthorization();
 
 app.MapPost("/api/users/login", async (LoginUserCommand command, LoginUserCommandHandler handler) =>
 {
