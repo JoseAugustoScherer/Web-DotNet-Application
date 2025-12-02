@@ -9,6 +9,7 @@
 - EF;
 - Layers Architecture;
 - Bogus Fake Data;
+- Jwt with Bearer;
 
 ### Running
 
