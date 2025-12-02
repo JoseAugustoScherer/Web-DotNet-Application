@@ -1,15 +1,18 @@
 using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MyMarket.Application.Abstractions;
 using MyMarket.Application.Features.Products.Commands;
 using MyMarket.Application.Features.Products.Queries;
 using MyMarket.Application.Features.Users.Commands;
 using MyMarket.Application.Features.Users.Queries;
+using MyMarket.Application.Services;
 using MyMarket.Application.Validators;
 using MyMarket.Application.ViewModel;
-using MyMarket.Core.Entities;
 using MyMarket.Core.Enums;
 using MyMarket.Core.Repositories.Interfaces;
 using MyMarket.Infrastructure.Auth;
@@ -20,31 +23,57 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    // 1. Adicionar a Definição de Segurança (Security Definition)
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\""
+    });
 
+    // 2. Adicionar o Requisito de Segurança (Security Requirement)
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 // ================================================ //
 // Builder = How to create the necessary artifacts  //
 // ================================================ //
 // Register of AuthService
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// Add and configure the authentication JWT
-// builder.Services
-//     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer(options =>
-//     {
-//         options.TokenValidationParameters = new TokenValidationParameters
-//         {
-//             ValidateIssuer = true,
-//             ValidateAudience = true,
-//             ValidateLifetime = true,
-//             ValidateIssuerSigningKey = true,
-//
-//             ValidIssuer = builder.Configuration["Jwt:Issuer"],
-//             ValidAudience = builder.Configuration["Jwt:Audience"],
-//             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-//         };
-//     });
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
 
 // Add authorization supports
 builder.Services.AddAuthorization();
@@ -67,7 +96,7 @@ builder.Services.AddScoped<GetProductByCategoryQueryHandler>();
 //Query user handlers
 builder.Services.AddScoped<GetAllUsersQueryHandler>();
 
-// Update Product handlers
+// Product handlers
 builder.Services.AddScoped<CreateProductCommandHandler>();
 builder.Services.AddScoped<UpdateProductNameCommandHandler>();
 builder.Services.AddScoped<DeleteProductCommandHandler>();
@@ -77,8 +106,9 @@ builder.Services.AddScoped<UpdateProductPriceCommandHandler>();
 builder.Services.AddScoped<UpdateProductCategoryCommandHandler>();
 builder.Services.AddScoped<UpdateProductStockCommandHandler>();
 
-// Update User handlers
+// User handlers
 builder.Services.AddScoped<ICommandHandler<CreateUserCommand, ResponseViewModel<Guid>>, CreateUserCommandHandler>();
+builder.Services.AddScoped<LoginUserCommandHandler>();
 
 // Fluent Validation
 builder.Services.AddFluentValidationAutoValidation();
@@ -114,8 +144,8 @@ app.UseHttpsRedirection();
 // Cors 
 app.UseCors("AllowFrontend");
 
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 // ===================================================
 // ENDPOINTS - Minimal API
@@ -139,7 +169,9 @@ app.MapPost("/api/products", async (CreateProductCommand command, CreateProductC
     
     var productId = await handler.HandleAsync(command);
     return Results.Created($"/api/products/{productId}", new { Id = productId });
-});
+})
+.RequireAuthorization();
+
 // By ID
 app.MapGet("/api/products/{id}", async (Guid id, GetProductByIdQueryHandler handler) =>
 {
@@ -168,7 +200,10 @@ app.MapDelete("/api/products/{id}/delete", async (Guid id, DeleteProductCommandH
         return Results.NoContent();
     
     return Results.StatusCode(result.StatusCode);
-});
+})
+.RequireAuthorization();
+
+// Path Updates
 app.MapPatch("/api/products/{id}/name", async (Guid id, UpdateProductInputModel input, UpdateProductNameCommandHandler handler) => 
 {
     var command = new UpdateProductNameCommand(id, input.Name);
@@ -258,6 +293,7 @@ app.MapPatch("/api/products/{id}/stock", async (Guid id, UpdateProductInputModel
         return Results.NotFound(e.Message);
     }
 });
+
 // USER
 app.MapPost("/api/users", async (CreateUserCommand command, ICommandHandler<CreateUserCommand, ResponseViewModel<Guid>> handler, IValidator<CreateUserCommand> validator) => 
 {
@@ -271,6 +307,18 @@ app.MapPost("/api/users", async (CreateUserCommand command, ICommandHandler<Crea
     var userId = await handler.HandleAsync(command);
     
     return Results.Created($"/api/users/{userId}", new { Id = userId });
+});
+
+app.MapPost("/api/users/login", async (LoginUserCommand command, LoginUserCommandHandler handler) =>
+{
+    var result = await handler.HandleAsync(command);
+
+    if (result.IsSuccess)
+    {
+        return Results.Ok(result);
+    }
+
+    return Results.StatusCode(result.StatusCode);
 });
 
 app.MapGet("/api/users", async (GetAllUsersQueryHandler handler) =>

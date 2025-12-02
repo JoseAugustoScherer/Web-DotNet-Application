@@ -1,36 +1,50 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using MyMarket.Application.Abstractions;
 using MyMarket.Application.Features.Users.DTOs;
+using MyMarket.Application.Services;
 using MyMarket.Application.ViewModel;
+using MyMarket.Core.Entities;
 using MyMarket.Core.Repositories.Interfaces;
 
 namespace MyMarket.Application.Features.Users.Commands;
 
-using LoginHandler = ICommandHandler<LoginUserCommand, ResponseViewModel<LoginUserResponse>>;
-
-public class LoginUserCommandHandler(IUserRepository userRepository) : LoginHandler
+public class LoginUserCommandHandler : ICommandHandler<LoginUserCommand, ResponseViewModel<LoginUserResponse>>
 {
+    private readonly IRepository<User> _userRepository;
+    private readonly IAuthService _authService;
+
+    public LoginUserCommandHandler(IRepository<User> userRepository, IAuthService authService)
+    {
+        _userRepository = userRepository;
+        _authService = authService;
+    }
+    
     public async Task<ResponseViewModel<LoginUserResponse>> HandleAsync(LoginUserCommand command)
     {
         try
         {
-            var user =  await userRepository.GetItemByAsync(x => x.Email == command.Email, CancellationToken.None);
+            Expression<Func<User, bool>> predicate = u => u.Email == command.Email;
+            var user = await _userRepository.GetItemByAsync(predicate, CancellationToken.None);
 
             if (user is null)
-                return ResponseViewModel<LoginUserResponse>.Fail("User not found", StatusCodes.Status404NotFound);
+                return ResponseViewModel<LoginUserResponse>.Fail("Invalid credentials.", StatusCodes.Status400BadRequest);
         
-            var hasher = new PasswordHasher<string>();
+            var passwordHash = _authService.ComputeSha256Hash(command.Password);
 
-            if (hasher.VerifyHashedPassword(null, user.Password, command.Password) != PasswordVerificationResult.Success) 
-                return ResponseViewModel<LoginUserResponse>.Fail("Password not found", StatusCodes.Status404NotFound);
+            if (user.Password != passwordHash)
+                return ResponseViewModel<LoginUserResponse>.Fail("Invalid credentials.", StatusCodes.Status400BadRequest);
         
-            return ResponseViewModel<LoginUserResponse>.Ok(new LoginUserResponse(user.Id.ToString()));
+            var token = _authService.GenerateJwtToken(user.Id, user.Email, user.Role.ToString());
+            var loginResponse = new LoginUserResponse(token);
+
+            return ResponseViewModel<LoginUserResponse>.Ok(loginResponse);
         }
         catch (Exception e)
         {
-            return ResponseViewModel<LoginUserResponse>.Fail(e.Message, StatusCodes.Status500InternalServerError);
+            var errorMessage = $"Error: {e.Message} --- StackTrace: {e.StackTrace}";
+            Console.WriteLine(errorMessage);
+            return ResponseViewModel<LoginUserResponse>.Fail(errorMessage, StatusCodes.Status500InternalServerError);
         }
-        
     }
 }
